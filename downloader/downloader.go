@@ -9,18 +9,18 @@ import (
 
 const BYTES_PER_DOT = 1024 * 1024
 
-func main_() error {
-	if len(os.Args) < 3 {
-		return fmt.Errorf("Usage: %s URL FILENAME", os.Args[0])
+func main_(args []string) error {
+	if len(args) < 3 {
+		return fmt.Errorf("Usage: %s URL FILENAME", args[0])
 	}
-	res, err := http.Get(os.Args[1])
+	res, err := http.Get(args[1])
 	if err != nil {
-		return fmt.Errorf("%s: %s", os.Args[1], err.Error())
+		return fmt.Errorf("%s: %s", args[1], err.Error())
 	}
 	defer res.Body.Close()
-	w, err2 := os.Create(os.Args[2])
+	w, err2 := os.Create(args[2])
 	if err2 != nil {
-		return fmt.Errorf("%s: %s", os.Args[2], err.Error())
+		return fmt.Errorf("%s: %s", args[2], err.Error())
 	}
 	defer w.Close()
 	for {
@@ -37,7 +37,7 @@ func main_() error {
 }
 
 func main() {
-	if err := main_(); err != nil && err != io.EOF {
+	if err := main_(os.Args); err != nil && err != io.EOF {
 		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(1)
 	} else {
