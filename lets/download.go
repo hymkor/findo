@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -10,17 +11,17 @@ import (
 const BYTES_PER_DOT = 1024 * 1024
 
 func download(args []string) error {
-	if len(args) < 3 {
-		return fmt.Errorf("Usage: %s URL FILENAME", args[0])
+	if len(args) < 2 {
+		return errors.New("Usage: download URL FILENAME")
 	}
-	res, err := http.Get(args[1])
+	res, err := http.Get(args[0])
 	if err != nil {
-		return fmt.Errorf("%s: %s", args[1], err.Error())
+		return err
 	}
 	defer res.Body.Close()
-	w, err2 := os.Create(args[2])
+	w, err2 := os.Create(args[1])
 	if err2 != nil {
-		return fmt.Errorf("%s: %s", args[2], err.Error())
+		return err2
 	}
 	defer w.Close()
 	for {
