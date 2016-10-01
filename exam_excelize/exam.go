@@ -16,5 +16,9 @@ func main() {
 		}
 		cell := xlsx.GetCellValue("Sheet1", "A1")
 		fmt.Println(cell)
+		for key,val := range xlsx.XLSX {
+			fmt.Printf("%s:%s\n",key,val)
+			fmt.Println("------------------------------------------------------------------------")
+		}
 	}
 }
