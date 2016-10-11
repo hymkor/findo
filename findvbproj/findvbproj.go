@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
@@ -43,6 +42,34 @@ type xmlProject struct {
 
 var macro = regexp.MustCompile(`\$\([^\)]+\)`)
 
+func replace1(xmldata xmlProject, lines []string) ([]string, bool) {
+	replaced := false
+	result := make([]string, 0, len(lines)*2)
+	for _, line1 := range lines {
+		loc := macro.FindStringIndex(line1)
+		if loc == nil {
+			result = append(result, line1)
+			continue
+		}
+		name := line1[loc[0]+2 : loc[1]-1]
+		found := false
+		for _, p := range xmldata.PropertyGroup {
+			value := p.Get(name)
+			if value != "" {
+				newline := line1[0:loc[0]] + value + line1[loc[1]:]
+				result = append(result, newline)
+				found = true
+				replaced = true
+			}
+		}
+		if !found {
+			newline := line1[0:loc[0]] + line1[loc[1]:]
+			result = append(result, newline)
+		}
+	}
+	return result, replaced
+}
+
 func main1(fname string) error {
 	rawdata, err2 := ioutil.ReadAll(os.Stdin)
 	if err2 != nil {
@@ -53,20 +80,13 @@ func main1(fname string) error {
 	if err3 != nil {
 		return err3
 	}
-	for _, p := range xmldata.PropertyGroup {
-		var buffer bytes.Buffer
-		for j, arg1 := range os.Args[1:] {
-			if j > 0 {
-				buffer.WriteString(" ")
-			}
-			value := macro.ReplaceAllStringFunc(arg1, func(m string) string {
-				return p.Get(m[2 : len(m)-1])
-			})
-			buffer.WriteString(value)
-		}
-		if buffer.Len() > 0 {
-			fmt.Println(buffer.String())
-		}
+	lines := []string{strings.Join(os.Args[1:], " ")}
+	replaced := true
+	for replaced {
+		lines, replaced = replace1(xmldata, lines)
+	}
+	for _, line1 := range lines {
+		fmt.Println(line1)
 	}
 	return nil
 }
