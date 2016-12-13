@@ -5,14 +5,13 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"strings"
 )
 
 func Main() error {
 	var rx *regexp.Regexp
 	if len(os.Args) >= 2 {
 		var err error
-		rx, err = regexp.Compile(os.Args[1])
+		rx, err = regexp.Compile("(?i)" + os.Args[1])
 		if err != nil {
 			return err
 		}
@@ -23,7 +22,6 @@ func Main() error {
 		if name == "." || name == ".." {
 			return nil
 		}
-		name = strings.ToLower(name)
 		if rx == nil || rx.MatchString(name) {
 			fmt.Println(path_)
 		}
