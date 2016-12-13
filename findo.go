@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 )
 
 func Main() error {
@@ -22,6 +23,7 @@ func Main() error {
 		if name == "." || name == ".." {
 			return nil
 		}
+		name = strings.ToLower(name)
 		if rx == nil || rx.MatchString(name) {
 			fmt.Println(path_)
 		}
