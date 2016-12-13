@@ -23,7 +23,7 @@ func Main() error {
 			return nil
 		}
 		if rx == nil || rx.MatchString(name) {
-			fmt.Println(name)
+			fmt.Println(path_)
 		}
 		return nil
 	})
