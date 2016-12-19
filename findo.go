@@ -5,6 +5,8 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+
+	"github.com/dustin/go-humanize"
 )
 
 func Main() error {
@@ -24,6 +26,7 @@ func Main() error {
 		}
 		if rx == nil || rx.MatchString(name) {
 			fmt.Println(path_)
+			fmt.Printf("%12s %s\n",humanize.Comma(info_.Size()),info_.ModTime().String())
 		}
 		return nil
 	})
