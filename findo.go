@@ -11,6 +11,7 @@ import (
 )
 
 var flagfileOnly = flag.Bool("f", false, "Select fileonly(Remove directories")
+var nameOnly = flag.Bool("1", false, "Show nameonly(No Size,timestamp)")
 
 func Main(args []string) error {
 	var rx *regexp.Regexp
@@ -32,7 +33,9 @@ func Main(args []string) error {
 		}
 		if rx == nil || rx.MatchString(name) {
 			fmt.Println(path_)
-			fmt.Printf("%12s %s\n", humanize.Comma(info_.Size()), info_.ModTime().String())
+			if !*nameOnly {
+				fmt.Printf("%12s %s\n", humanize.Comma(info_.Size()), info_.ModTime().String())
+			}
 		}
 		return nil
 	})
