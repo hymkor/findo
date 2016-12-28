@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -9,11 +10,13 @@ import (
 	"github.com/dustin/go-humanize"
 )
 
-func Main() error {
+var flagfileOnly = flag.Bool("f", false, "Select fileonly(Remove directories")
+
+func Main(args []string) error {
 	var rx *regexp.Regexp
-	if len(os.Args) >= 2 {
+	if len(args) >= 1 {
 		var err error
-		rx, err = regexp.Compile("(?i)" + os.Args[1])
+		rx, err = regexp.Compile("(?i)" + args[0])
 		if err != nil {
 			return err
 		}
@@ -24,9 +27,12 @@ func Main() error {
 		if name == "." || name == ".." {
 			return nil
 		}
+		if *flagfileOnly && info_.IsDir() {
+			return nil
+		}
 		if rx == nil || rx.MatchString(name) {
 			fmt.Println(path_)
-			fmt.Printf("%12s %s\n",humanize.Comma(info_.Size()),info_.ModTime().String())
+			fmt.Printf("%12s %s\n", humanize.Comma(info_.Size()), info_.ModTime().String())
 		}
 		return nil
 	})
@@ -34,7 +40,8 @@ func Main() error {
 }
 
 func main() {
-	if err := Main(); err != nil {
+	flag.Parse()
+	if err := Main(flag.Args()); err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 	}
 }
