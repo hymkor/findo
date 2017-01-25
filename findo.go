@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"regexp"
+	"strings"
 
 	"github.com/dustin/go-humanize"
 )
@@ -14,13 +14,9 @@ var flagfileOnly = flag.Bool("f", false, "Select fileonly(Remove directories")
 var nameOnly = flag.Bool("1", false, "Show nameonly(No Size,timestamp)")
 
 func Main(args []string) error {
-	var rx *regexp.Regexp
+	var pattern string
 	if len(args) >= 1 {
-		var err error
-		rx, err = regexp.Compile("(?i)" + args[0])
-		if err != nil {
-			return err
-		}
+		pattern = strings.ToUpper(args[0])
 	}
 
 	filepath.Walk(".", func(path_ string, info_ os.FileInfo, err_ error) error {
@@ -31,7 +27,17 @@ func Main(args []string) error {
 		if *flagfileOnly && info_.IsDir() {
 			return nil
 		}
-		if rx == nil || rx.MatchString(name) {
+		var matched bool
+		if pattern == "" {
+			matched = true
+		} else {
+			var err error
+			matched, err = filepath.Match(pattern, strings.ToUpper(name))
+			if err != nil {
+				matched = false
+			}
+		}
+		if matched {
 			fmt.Println(path_)
 			if !*nameOnly {
 				fmt.Printf("%12s %s\n", humanize.Comma(info_.Size()), info_.ModTime().String())
