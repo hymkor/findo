@@ -8,15 +8,25 @@ import (
 	"strings"
 
 	"github.com/dustin/go-humanize"
+	"github.com/mattn/go-isatty"
 )
 
 var flagfileOnly = flag.Bool("f", false, "Select fileonly(Remove directories")
 var nameOnly = flag.Bool("1", false, "Show nameonly(No Size,timestamp)")
+var flagList = flag.Bool("l", false, "Show Size and timestamp")
 
 func Main(args []string) error {
 	var pattern string
 	if len(args) >= 1 {
 		pattern = strings.ToUpper(args[0])
+	}
+
+	rich := isatty.IsTerminal(os.Stdout.Fd())
+	if *flagList {
+		rich = true
+	}
+	if *nameOnly {
+		rich = false
 	}
 
 	filepath.Walk(".", func(path_ string, info_ os.FileInfo, err_ error) error {
@@ -39,7 +49,7 @@ func Main(args []string) error {
 		}
 		if matched {
 			fmt.Println(path_)
-			if !*nameOnly {
+			if rich {
 				fmt.Printf("%12s %s\n", humanize.Comma(info_.Size()), info_.ModTime().String())
 			}
 		}
