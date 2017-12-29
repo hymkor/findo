@@ -14,6 +14,7 @@ import (
 var flagfileOnly = flag.Bool("f", false, "Select fileonly(Remove directories")
 var nameOnly = flag.Bool("1", false, "Show nameonly(No Size,timestamp)")
 var flagList = flag.Bool("l", false, "Show Size and timestamp")
+var startDir = flag.String("d", ".", "Set start Directory")
 
 func Main(args []string) error {
 	var pattern string
@@ -29,7 +30,7 @@ func Main(args []string) error {
 		rich = false
 	}
 
-	filepath.Walk(".", func(path_ string, info_ os.FileInfo, err_ error) error {
+	filepath.Walk(*startDir, func(path_ string, info_ os.FileInfo, err_ error) error {
 		name := filepath.Base(path_)
 		if name == "." || name == ".." {
 			return nil
