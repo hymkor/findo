@@ -12,6 +12,7 @@ import (
 )
 
 var flagfileOnly = flag.Bool("f", false, "Select fileonly(Remove directories")
+var quotation = flag.Bool("q", false, "Quotation filenames")
 var nameOnly = flag.Bool("1", false, "Show nameonly(No Size,timestamp)")
 var flagList = flag.Bool("l", false, "Show Size and timestamp")
 var startDir = flag.String("d", ".", "Set start Directory")
@@ -49,7 +50,11 @@ func Main(args []string) error {
 			}
 		}
 		if matched {
-			fmt.Println(path_)
+			if *quotation {
+				fmt.Printf("\"%s\"\n", path_)
+			} else {
+				fmt.Println(path_)
+			}
 			if rich {
 				fmt.Printf("%12s %s\n", humanize.Comma(info_.Size()), info_.ModTime().String())
 			}
