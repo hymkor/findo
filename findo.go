@@ -17,7 +17,7 @@ var nameOnly = flag.Bool("1", false, "Show nameonly(No Size,timestamp)")
 var flagList = flag.Bool("l", false, "Show Size and timestamp")
 var startDir = flag.String("d", ".", "Set start Directory")
 
-func Main(args []string) error {
+func main1(args []string) error {
 	var pattern string
 	if len(args) >= 1 {
 		pattern = strings.ToUpper(args[0])
@@ -66,7 +66,7 @@ func Main(args []string) error {
 
 func main() {
 	flag.Parse()
-	if err := Main(flag.Args()); err != nil {
+	if err := main1(flag.Args()); err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 	}
 }
