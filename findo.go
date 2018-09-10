@@ -18,9 +18,9 @@ var flagList = flag.Bool("l", false, "Show Size and timestamp")
 var startDir = flag.String("d", ".", "Set start Directory")
 
 func main1(args []string) error {
-	var pattern string
-	if len(args) >= 1 {
-		pattern = strings.ToUpper(args[0])
+	patterns := make([]string, len(args))
+	for i := 0; i < len(args); i++ {
+		patterns[i] = strings.ToUpper(args[i])
 	}
 
 	rich := isatty.IsTerminal(os.Stdout.Fd())
@@ -40,13 +40,15 @@ func main1(args []string) error {
 			return nil
 		}
 		var matched bool
-		if pattern == "" {
+		if len(patterns) <= 0 {
 			matched = true
 		} else {
-			var err error
-			matched, err = filepath.Match(pattern, strings.ToUpper(name))
-			if err != nil {
-				matched = false
+			matched = false
+			for _, pattern := range patterns {
+				m, err := filepath.Match(pattern, strings.ToUpper(name))
+				if err == nil && m {
+					matched = true
+				}
 			}
 		}
 		if matched {
