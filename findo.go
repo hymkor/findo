@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -16,6 +17,7 @@ var quotation = flag.Bool("q", false, "Quotation filenames")
 var nameOnly = flag.Bool("1", false, "Show nameonly(No Size,timestamp)")
 var flagList = flag.Bool("l", false, "Show Size and timestamp")
 var startDir = flag.String("d", ".", "Set start Directory")
+var execCmd = flag.String("exec", "", "execute command: {} is replaced to filename")
 
 func main1(args []string) error {
 	patterns := make([]string, len(args))
@@ -52,13 +54,22 @@ func main1(args []string) error {
 			}
 		}
 		if matched {
-			if *quotation {
-				fmt.Printf("\"%s\"\n", path_)
+			if *execCmd != "" {
+				cmdline := strings.Replace(*execCmd, "{}", path_, -1)
+				cmd1 := exec.Command("cmd.exe", "/c", cmdline)
+				cmd1.Stdout = os.Stdout
+				cmd1.Stderr = os.Stderr
+				cmd1.Stdin = os.Stdin
+				cmd1.Run()
 			} else {
-				fmt.Println(path_)
-			}
-			if rich {
-				fmt.Printf("%12s %s\n", humanize.Comma(info_.Size()), info_.ModTime().String())
+				if *quotation {
+					fmt.Printf("\"%s\"\n", path_)
+				} else {
+					fmt.Println(path_)
+				}
+				if rich {
+					fmt.Printf("%12s %s\n", humanize.Comma(info_.Size()), info_.ModTime().String())
+				}
 			}
 		}
 		return nil
