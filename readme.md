@@ -57,3 +57,22 @@ $ findo H*
          716 2018-06-22 18:08:28.6822833 +0900 JST
     :
 ```
+
+Example-4: Executing commands
+
+```
+$ findo -q -x "echo {} & wc.exe -l {}" *md
+"hoge and hoge.md"
+      0
+"make.cmd"
+      5
+"readme.md"
+     65
+```
+
+
+
+
+
+
+
