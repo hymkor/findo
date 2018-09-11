@@ -1,16 +1,21 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/zetamatta/findo)](https://goreportcard.com/report/github.com/zetamatta/findo)
 
-findo - command for Windows like find of UNIX 
-==============================================
+findo.exe - a command like find of UNIX for Windows 
+===================================================
 
 The `findo.exe` search files from the tree below the current directory.
 
 ```
 $ findo -h
 Usage of findo.exe:
-  -1    Show nameonly(No Size,timestamp)
-  -f    Select fileonly(Remove directories
-  -l    Show Size and timestamp
+  -1    Show nameonly without size and timestamp
+  -d string
+        Set start Directory (default ".")
+  -f    Select fileonly not including directories
+  -l    Show size and timestamp
+  -q    Enclose filename with double-quotations
+  -x string
+        Execute a command replacing {} to FILENAME
 ```
 
 Example-1: no arguments and no redirect
@@ -59,20 +64,27 @@ $ findo H*
 ```
 
 Example-4: Executing commands
+-----------------------------
 
 ```
-$ findo -q -x "echo {} & wc.exe -l {}" *md
+$ findo -q -x "echo {} & wc.exe -l {}" *.md *.go
+"findo.go"
+     95
 "hoge and hoge.md"
       0
-"make.cmd"
-      5
 "readme.md"
-     65
+     90
 ```
 
+History
+=======
 
+20180912
+--------
+- Add options: `-x`,`-q`,`-d`,`-l`
+- Support Multi patterns
+- If stdout is terminal, output simple. and add `-l` option
 
-
-
-
-
+20171128
+--------
+- First release
