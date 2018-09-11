@@ -12,14 +12,30 @@ import (
 	"github.com/mattn/go-isatty"
 )
 
-var flagfileOnly = flag.Bool("f", false, "Select fileonly(Remove directories")
-var quotation = flag.Bool("q", false, "Quotation filenames")
-var nameOnly = flag.Bool("1", false, "Show nameonly(No Size,timestamp)")
-var flagList = flag.Bool("l", false, "Show Size and timestamp")
+var flagfileOnly = flag.Bool("f", false, "Select fileonly not including directories")
+var quotation = flag.Bool("q", false, "Enclose filename with double-quotations")
+var nameOnly = flag.Bool("1", false, "Show nameonly without size and timestamp")
+var flagList = flag.Bool("l", false, "Show size and timestamp")
 var startDir = flag.String("d", ".", "Set start Directory")
-var execCmd = flag.String("exec", "", "execute command: {} is replaced to filename")
+var execCmd = flag.String("x", "", "Execute a command replacing {} to FILENAME")
+
+func system(cmdline string) error {
+	const CMDVAR = "CMDVAR"
+
+	orgcmdarg := os.Getenv(CMDVAR)
+	defer os.Setenv(CMDVAR, orgcmdarg)
+
+	os.Setenv(CMDVAR, cmdline)
+
+	cmd1 := exec.Command("cmd.exe", "/c", "%"+CMDVAR+"%")
+	cmd1.Stdout = os.Stdout
+	cmd1.Stderr = os.Stderr
+	cmd1.Stdin = os.Stdin
+	return cmd1.Run()
+}
 
 func main1(args []string) error {
+
 	patterns := make([]string, len(args))
 	for i := 0; i < len(args); i++ {
 		patterns[i] = strings.ToUpper(args[i])
@@ -54,19 +70,13 @@ func main1(args []string) error {
 			}
 		}
 		if matched {
+			if *quotation {
+				path_ = `"` + path_ + `"`
+			}
 			if *execCmd != "" {
-				cmdline := strings.Replace(*execCmd, "{}", path_, -1)
-				cmd1 := exec.Command("cmd.exe", "/c", cmdline)
-				cmd1.Stdout = os.Stdout
-				cmd1.Stderr = os.Stderr
-				cmd1.Stdin = os.Stdin
-				cmd1.Run()
+				system(strings.Replace(*execCmd, "{}", path_, -1))
 			} else {
-				if *quotation {
-					fmt.Printf("\"%s\"\n", path_)
-				} else {
-					fmt.Println(path_)
-				}
+				fmt.Println(path_)
 				if rich {
 					fmt.Printf("%12s %s\n", humanize.Comma(info_.Size()), info_.ModTime().String())
 				}
