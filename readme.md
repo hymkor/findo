@@ -1,9 +1,9 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/zetamatta/findo)](https://goreportcard.com/report/github.com/zetamatta/findo)
 
-findo.exe - a command like find of UNIX for Windows 
-===================================================
+findo - a command like `find`
+==============================
 
-The `findo.exe` search files from the tree below the current directory.
+The `findo` search files from the tree below the current directory.
 
 ```
 $ findo -h
@@ -21,7 +21,7 @@ Usage of findo.exe:
 Example-1: no arguments and no redirect
 -------------------------------------
 
-findo.exe prints the tree under the current directory.
+`findo` prints the tree under the current directory.
 
 ```
 $ findo
@@ -78,6 +78,10 @@ $ findo -q -x "echo {} & wc.exe -l {}" *.md *.go
 
 History
 =======
+
+(no binary)
+-----------
+- Support Linux not only Windows
 
 20180912
 --------
