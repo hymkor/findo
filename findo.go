@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -18,21 +17,6 @@ var nameOnly = flag.Bool("1", false, "Show nameonly without size and timestamp")
 var flagList = flag.Bool("l", false, "Show size and timestamp")
 var startDir = flag.String("d", ".", "Set start Directory")
 var execCmd = flag.String("x", "", "Execute a command replacing {} to FILENAME")
-
-func system(cmdline string) error {
-	const CMDVAR = "CMDVAR"
-
-	orgcmdarg := os.Getenv(CMDVAR)
-	defer os.Setenv(CMDVAR, orgcmdarg)
-
-	os.Setenv(CMDVAR, cmdline)
-
-	cmd1 := exec.Command("cmd.exe", "/c", "%"+CMDVAR+"%")
-	cmd1.Stdout = os.Stdout
-	cmd1.Stderr = os.Stderr
-	cmd1.Stdin = os.Stdin
-	return cmd1.Run()
-}
 
 func main1(args []string) error {
 
