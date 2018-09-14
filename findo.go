@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/dustin/go-humanize"
 	"github.com/mattn/go-isatty"
@@ -17,6 +18,7 @@ var nameOnly = flag.Bool("1", false, "Show nameonly without size and timestamp")
 var flagList = flag.Bool("l", false, "Show size and timestamp")
 var startDir = flag.String("d", ".", "Set start Directory")
 var execCmd = flag.String("x", "", "Execute a command replacing {} to FILENAME")
+var in = flag.Duration("in", 0, "Files modified in the duration such as 300ms, -1.5h or 2h45m")
 
 func main1(args []string) error {
 
@@ -41,29 +43,32 @@ func main1(args []string) error {
 		if *flagfileOnly && info_.IsDir() {
 			return nil
 		}
-		var matched bool
-		if len(patterns) <= 0 {
-			matched = true
-		} else {
-			matched = false
+		if len(patterns) > 0 {
+			matched := false
 			for _, pattern := range patterns {
 				m, err := filepath.Match(pattern, strings.ToUpper(name))
 				if err == nil && m {
 					matched = true
+					break
 				}
+			}
+			if !matched {
+				return nil
 			}
 		}
-		if matched {
-			if *quotation {
-				path_ = `"` + path_ + `"`
-			}
-			if *execCmd != "" {
-				system(strings.Replace(*execCmd, "{}", path_, -1))
-			} else {
-				fmt.Println(path_)
-				if rich {
-					fmt.Printf("%12s %s\n", humanize.Comma(info_.Size()), info_.ModTime().String())
-				}
+		if *in != 0 && time.Now().Sub(info_.ModTime()) > *in {
+			return nil
+		}
+
+		if *quotation {
+			path_ = `"` + path_ + `"`
+		}
+		if *execCmd != "" {
+			system(strings.Replace(*execCmd, "{}", path_, -1))
+		} else {
+			fmt.Println(path_)
+			if rich {
+				fmt.Printf("%12s %s\n", humanize.Comma(info_.Size()), info_.ModTime().String())
 			}
 		}
 		return nil
