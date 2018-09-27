@@ -19,6 +19,7 @@ var flagList = flag.Bool("l", false, "Show size and timestamp")
 var startDir = flag.String("d", ".", "Set start Directory")
 var execCmd = flag.String("x", "", "Execute a command replacing {} to FILENAME")
 var in = flag.Duration("in", 0, "Files modified in the duration such as 300ms, -1.5h or 2h45m")
+var ignoreDots = flag.Bool("ignoredots", false, "Ignore files and directory starting with dot")
 
 func main1(args []string) error {
 
@@ -39,6 +40,11 @@ func main1(args []string) error {
 		name := filepath.Base(path_)
 		if name == "." || name == ".." {
 			return nil
+		}
+		if *ignoreDots {
+			if name[0] == '.' || path_[0] == '.' || strings.Contains(path_, string(os.PathSeparator)+".") {
+				return nil
+			}
 		}
 		if *flagfileOnly && info_.IsDir() {
 			return nil
