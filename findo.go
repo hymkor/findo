@@ -13,13 +13,13 @@ import (
 )
 
 var flagfileOnly = flag.Bool("f", false, "Select fileonly not including directories")
-var quotation = flag.Bool("q", false, "Enclose filename with double-quotations")
-var nameOnly = flag.Bool("1", false, "Show nameonly without size and timestamp")
+var flagQuotation = flag.Bool("q", false, "Enclose filename with double-quotations")
+var flagNameOnly = flag.Bool("1", false, "Show nameonly without size and timestamp")
 var flagList = flag.Bool("l", false, "Show size and timestamp")
-var startDir = flag.String("d", ".", "Set start Directory")
-var execCmd = flag.String("x", "", "Execute a command replacing {} to FILENAME")
-var in = flag.Duration("in", 0, "Files modified in the duration such as 300ms, -1.5h or 2h45m")
-var ignoreDots = flag.Bool("ignoredots", false, "Ignore files and directory starting with dot")
+var flagStartDir = flag.String("d", ".", "Set start Directory")
+var flagExecCmd = flag.String("x", "", "Execute a command replacing {} to FILENAME")
+var flagIn = flag.Duration("in", 0, "Files modified in the duration such as 300ms, -1.5h or 2h45m")
+var flagIgnoreDots = flag.Bool("ignoredots", false, "Ignore files and directory starting with dot")
 
 func main1(args []string) error {
 
@@ -32,16 +32,16 @@ func main1(args []string) error {
 	if *flagList {
 		rich = true
 	}
-	if *nameOnly {
+	if *flagNameOnly {
 		rich = false
 	}
 
-	filepath.Walk(*startDir, func(path_ string, info_ os.FileInfo, err_ error) error {
+	filepath.Walk(*flagStartDir, func(path_ string, info_ os.FileInfo, err_ error) error {
 		name := filepath.Base(path_)
 		if name == "." || name == ".." {
 			return nil
 		}
-		if *ignoreDots {
+		if *flagIgnoreDots {
 			if name[0] == '.' || path_[0] == '.' || strings.Contains(path_, string(os.PathSeparator)+".") {
 				return nil
 			}
@@ -62,15 +62,15 @@ func main1(args []string) error {
 				return nil
 			}
 		}
-		if *in != 0 && time.Now().Sub(info_.ModTime()) > *in {
+		if *flagIn != 0 && time.Now().Sub(info_.ModTime()) > *flagIn {
 			return nil
 		}
 
-		if *quotation {
+		if *flagQuotation {
 			path_ = `"` + path_ + `"`
 		}
-		if *execCmd != "" {
-			system(strings.Replace(*execCmd, "{}", path_, -1))
+		if *flagExecCmd != "" {
+			system(strings.Replace(*flagExecCmd, "{}", path_, -1))
 		} else {
 			fmt.Println(path_)
 			if rich {
