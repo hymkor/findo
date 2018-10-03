@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -36,17 +37,31 @@ func main1(args []string) error {
 		rich = false
 	}
 
-	filepath.Walk(*flagStartDir, func(path_ string, info_ os.FileInfo, err_ error) error {
-		name := filepath.Base(path_)
+	var walk func(string, os.FileInfo) error
+	walk = func(path string, info os.FileInfo) error {
+		name := filepath.Base(path)
 		if name == "." || name == ".." {
 			return nil
 		}
 		if *flagIgnoreDots {
-			if name[0] == '.' || path_[0] == '.' || strings.Contains(path_, string(os.PathSeparator)+".") {
+			if name[0] == '.' || path[0] == '.' || strings.Contains(path, string(os.PathSeparator)+".") {
 				return nil
 			}
 		}
-		if *flagfileOnly && info_.IsDir() {
+		if info.IsDir() {
+			children, err := ioutil.ReadDir(path)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "%s: %s\n", path, err)
+			} else {
+				for _, child := range children {
+					childpath := filepath.Join(path, child.Name())
+					if err := walk(childpath, child); err != nil {
+						fmt.Fprintf(os.Stderr, "%s: %s\n", childpath, err)
+					}
+				}
+			}
+		}
+		if *flagfileOnly && info.IsDir() {
 			return nil
 		}
 		if len(patterns) > 0 {
@@ -62,23 +77,34 @@ func main1(args []string) error {
 				return nil
 			}
 		}
-		if *flagIn != 0 && time.Now().Sub(info_.ModTime()) > *flagIn {
+		if *flagIn != 0 && time.Now().Sub(info.ModTime()) > *flagIn {
 			return nil
 		}
 
 		if *flagQuotation {
-			path_ = `"` + path_ + `"`
+			path = `"` + path + `"`
 		}
 		if *flagExecCmd != "" {
-			system(strings.Replace(*flagExecCmd, "{}", path_, -1))
+			system(strings.Replace(*flagExecCmd, "{}", path, -1))
 		} else {
-			fmt.Println(path_)
+			fmt.Println(path)
 			if rich {
-				fmt.Printf("%12s %s\n", humanize.Comma(info_.Size()), info_.ModTime().String())
+				fmt.Printf("%12s %s\n", humanize.Comma(info.Size()), info.ModTime().String())
 			}
 		}
 		return nil
-	})
+	}
+
+	startDir, err := ioutil.ReadDir(*flagStartDir)
+	if err != nil {
+		return err
+	}
+	for _, child := range startDir {
+		childpath := filepath.Join(*flagStartDir, child.Name())
+		if err := walk(childpath, child); err != nil {
+			fmt.Fprintf(os.Stderr, "%s: %s\n", childpath, err)
+		}
+	}
 	return nil
 }
 
