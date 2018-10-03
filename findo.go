@@ -43,10 +43,8 @@ func main1(args []string) error {
 		if name == "." || name == ".." {
 			return nil
 		}
-		if *flagIgnoreDots {
-			if name[0] == '.' || path[0] == '.' || strings.Contains(path, string(os.PathSeparator)+".") {
-				return nil
-			}
+		if *flagIgnoreDots && name[0] == '.' {
+			return nil
 		}
 		if info.IsDir() {
 			children, err := ioutil.ReadDir(path)
