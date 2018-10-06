@@ -22,6 +22,20 @@ var flagExecCmd = flag.String("x", "", "Execute a command replacing {} to FILENA
 var flagIn = flag.Duration("in", 0, "Files modified in the duration such as 300ms, -1.5h or 2h45m")
 var flagIgnoreDots = flag.Bool("ignoredots", false, "Ignore files and directory starting with dot")
 
+func eachfile(dirname string, walk func(string, os.FileInfo) error) {
+	children, err := ioutil.ReadDir(dirname)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%s: %s\n", dirname, err)
+		return
+	}
+	for _, child := range children {
+		childpath := filepath.Join(dirname, child.Name())
+		if err := walk(childpath, child); err != nil {
+			fmt.Fprintf(os.Stderr, "%s: %s\n", childpath, err)
+		}
+	}
+}
+
 func main1(args []string) error {
 
 	patterns := make([]string, len(args))
@@ -47,17 +61,7 @@ func main1(args []string) error {
 			return nil
 		}
 		if info.IsDir() {
-			children, err := ioutil.ReadDir(path)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "%s: %s\n", path, err)
-			} else {
-				for _, child := range children {
-					childpath := filepath.Join(path, child.Name())
-					if err := walk(childpath, child); err != nil {
-						fmt.Fprintf(os.Stderr, "%s: %s\n", childpath, err)
-					}
-				}
-			}
+			eachfile(path, walk)
 		}
 		if *flagfileOnly && info.IsDir() {
 			return nil
@@ -92,17 +96,7 @@ func main1(args []string) error {
 		}
 		return nil
 	}
-
-	startDir, err := ioutil.ReadDir(*flagStartDir)
-	if err != nil {
-		return err
-	}
-	for _, child := range startDir {
-		childpath := filepath.Join(*flagStartDir, child.Name())
-		if err := walk(childpath, child); err != nil {
-			fmt.Fprintf(os.Stderr, "%s: %s\n", childpath, err)
-		}
-	}
+	eachfile(*flagStartDir, walk)
 	return nil
 }
 
