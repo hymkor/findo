@@ -21,6 +21,7 @@ var flagStartDir = flag.String("d", ".", "Set start Directory")
 var flagExecCmd = flag.String("x", "", "Execute a command replacing {} to FILENAME")
 var flagIn = flag.Duration("in", 0, "Files modified in the duration such as 300ms, -1.5h or 2h45m")
 var flagIgnoreDots = flag.Bool("ignoredots", false, "Ignore files and directory starting with dot")
+var flagVerbose = flag.Bool("v", false, "verbose (use with -x)")
 
 func eachfile(dirname string, walk func(string, os.FileInfo) error) {
 	children, err := ioutil.ReadDir(dirname)
@@ -87,6 +88,9 @@ func main1(args []string) error {
 			path = `"` + path + `"`
 		}
 		if *flagExecCmd != "" {
+			if *flagVerbose {
+				fmt.Fprintln(os.Stderr, path)
+			}
 			system(strings.Replace(*flagExecCmd, "{}", path, -1))
 		} else {
 			fmt.Println(path)
