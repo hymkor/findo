@@ -16,6 +16,8 @@ Usage of findo.exe:
         Ignore files and directory starting with dot
   -in duration
         Files modified in the duration such as 300ms, -1.5h or 2h45m
+  -notin duration
+        Files modified not in the duration such as 300ms, -1.5h or 2h45m
   -l    Show size and timestamp
   -q    Enclose filename with double-quotations
   -v    verbose (use with -x)
