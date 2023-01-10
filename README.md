@@ -74,13 +74,17 @@ Example-4: Executing commands
 -----------------------------
 
 ```
-$ findo -q -x "echo {} & wc.exe -l {}" *.md *.go
-"findo.go"
-     95
-"hoge and hoge.md"
+$ findo -X "wc -l {}" *.md *.go
+wc -l "README.md"
+    102
+wc -l "hoge and hoge.md"
       0
-"readme.md"
-     90
+wc -l "main.go"
+    124
+wc -l "system_linux.go"
+     15
+wc -l "system_windows.go"
+     21
 ```
 
 History
