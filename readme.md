@@ -86,16 +86,17 @@ $ findo -q -x "echo {} & wc.exe -l {}" *.md *.go
 History
 =======
 
-(no binary)
------------
+v0.3.0
+------
+- Add option: `-X`: same as -x,-v and -q
 - Support Linux not only Windows
 
-20180912
---------
+v0.2.0 (20180912)
+-----------------
 - Add options: `-x`,`-q`,`-d`,`-l`
 - Support Multi patterns
 - If stdout is terminal, output simple. and add `-l` option
 
-20171128
---------
+v0.1.0 (20171128)
+-----------------
 - First release
