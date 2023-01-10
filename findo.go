@@ -20,6 +20,7 @@ var (
 	flagList       = flag.Bool("l", false, "Show size and timestamp")
 	flagStartDir   = flag.String("d", ".", "Set start Directory")
 	flagExecCmd    = flag.String("x", "", "Execute a command replacing {} to FILENAME")
+	flagExecWithQ  = flag.String("X", "", `Execute a command replacing {} to "FILENAME" (same as -x,-v and -q)`)
 	flagIn         = flag.Duration("in", 0, "Files modified in the duration such as 300ms, -1.5h or 2h45m")
 	flagNotIn      = flag.Duration("notin", 0, "Files modified not in the duration such as 300ms, -1.5h or 2h45m")
 	flagIgnoreDots = flag.Bool("ignoredots", false, "Ignore files and directory starting with dot")
@@ -89,14 +90,20 @@ func main1(args []string) error {
 		if *flagNotIn != 0 && time.Now().Sub(info.ModTime()) <= *flagNotIn {
 			return nil
 		}
+		if *flagExecWithQ != "" {
+			*flagExecCmd = *flagExecWithQ
+			*flagQuotation = true
+			*flagVerbose = true
+		}
 		if *flagQuotation {
 			path = `"` + path + `"`
 		}
 		if *flagExecCmd != "" {
+			cmdline := strings.Replace(*flagExecCmd, "{}", path, -1)
 			if *flagVerbose {
-				fmt.Fprintln(os.Stderr, path)
+				fmt.Fprintln(os.Stderr, cmdline)
 			}
-			system(strings.Replace(*flagExecCmd, "{}", path, -1))
+			system(cmdline)
 		} else {
 			fmt.Println(path)
 			if rich {
