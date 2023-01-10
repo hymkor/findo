@@ -13,16 +13,18 @@ import (
 	"github.com/mattn/go-isatty"
 )
 
-var flagfileOnly = flag.Bool("f", false, "Select fileonly not including directories")
-var flagQuotation = flag.Bool("q", false, "Enclose filename with double-quotations")
-var flagNameOnly = flag.Bool("1", false, "Show nameonly without size and timestamp")
-var flagList = flag.Bool("l", false, "Show size and timestamp")
-var flagStartDir = flag.String("d", ".", "Set start Directory")
-var flagExecCmd = flag.String("x", "", "Execute a command replacing {} to FILENAME")
-var flagIn = flag.Duration("in", 0, "Files modified in the duration such as 300ms, -1.5h or 2h45m")
-var flagNotIn = flag.Duration("notin", 0, "Files modified not in the duration such as 300ms, -1.5h or 2h45m")
-var flagIgnoreDots = flag.Bool("ignoredots", false, "Ignore files and directory starting with dot")
-var flagVerbose = flag.Bool("v", false, "verbose (use with -x)")
+var (
+	flagfileOnly   = flag.Bool("f", false, "Select fileonly not including directories")
+	flagQuotation  = flag.Bool("q", false, "Enclose filename with double-quotations")
+	flagNameOnly   = flag.Bool("1", false, "Show nameonly without size and timestamp")
+	flagList       = flag.Bool("l", false, "Show size and timestamp")
+	flagStartDir   = flag.String("d", ".", "Set start Directory")
+	flagExecCmd    = flag.String("x", "", "Execute a command replacing {} to FILENAME")
+	flagIn         = flag.Duration("in", 0, "Files modified in the duration such as 300ms, -1.5h or 2h45m")
+	flagNotIn      = flag.Duration("notin", 0, "Files modified not in the duration such as 300ms, -1.5h or 2h45m")
+	flagIgnoreDots = flag.Bool("ignoredots", false, "Ignore files and directory starting with dot")
+	flagVerbose    = flag.Bool("v", false, "verbose (use with -x)")
+)
 
 func eachfile(dirname string, walk func(string, os.FileInfo) error) {
 	children, err := ioutil.ReadDir(dirname)
